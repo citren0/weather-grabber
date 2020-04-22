@@ -4,7 +4,9 @@
 import csv
 import string
 import requests
+import json
 
+verbose = True
 
 def getLatLong():
     with open('us-zip-code-latitude-and-longitude.csv', newline = '') as csvfile:
@@ -15,7 +17,9 @@ def getLatLong():
 
         for row in csvfile:
             if zCode in row:
-                print("Zip located: " + row) # Column 4 / 5 are lat/long
+                print("Zip located.\n")
+                if verbose:
+                    print(row) # Column 4 / 5 are lat/long
                 rawData = row
 
         if rawData == "":
@@ -53,18 +57,44 @@ def getLatLong():
         getWeather(lattitude, longitude)
 
 def getWeather(lattit, longit):
-    print(lattit, longit)
+    if verbose:
+        print(lattit, longit)
+
+    fullurl = "http://api.weather.gov/points/" + lattit + "," + longit
+
+    if verbose:
+        print(fullurl)
+
+    data = str(requests.get(fullurl)).replace('\n', '')
+    if verbose:
+        print(data)
+    
+    for line in data:
+        print(line)
+
+
+
+
+
+
+
+
 
 def menu():
     print("Geolocation weather finder based on zip code or longitude and lattitude.")
-    choice = input("1. Zip Code \n2. Lattitude Longitude \n3. Quit \n")
+    choice0 = input("type 'v' for verbose or anything else for nonverbose mode: ")
+    if 'v' not in choice0.lower():
+        verbose = False
+    else:
+        print("Verbose active")
+
+    choice = input("\n1. Zip Code \n2. Lattitude Longitude \n3. Quit \n")
     if "1" in choice:
         getLatLong()
 
     elif "2" in choice:
         lattitude = input("What is your lattitude? ")
-        print("\n")
-        longitude = input("What is your longitude? ")
+        longitude = input("\nWhat is your longitude? ")
         print("\n\n")
         getWeather(lattitude, longitude)
 
