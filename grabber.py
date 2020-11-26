@@ -6,7 +6,6 @@ import string
 import requests
 import json
 
-verbose = True
 
 def getLatLong():
     with open('us-zip-code-latitude-and-longitude.csv', newline = '') as csvfile:
@@ -18,8 +17,7 @@ def getLatLong():
         for row in csvfile:
             if zCode in row:
                 print("Zip located.\n")
-                if verbose:
-                    print(row) # Column 4 / 5 are lat/long
+                print(row) # Column 4 / 5 are lat/long
                 rawData = row
 
         if rawData == "":
@@ -57,20 +55,24 @@ def getLatLong():
         getWeather(lattitude, longitude)
 
 def getWeather(lattit, longit):
-    if verbose:
-        print(lattit, longit)
+    fullURL = "http://api.weather.gov/points/" + lattit + "," + longit
 
-    fullurl = "http://api.weather.gov/points/" + lattit + "," + longit
+    headers = {
+        'User-Agent': 'testtest123'
+    }
+    data = requests.get(fullURL, headers=headers)
+    data = data.json()
 
-    if verbose:
-        print(fullurl)
 
-    data = str(requests.get(fullurl)).replace('\n', '')
-    if verbose:
-        print(data)
+    hourlyData = requests.get(data['properties']['forecastHourly'], headers=headers)
+    hourlyData = hourlyData.json()
+
     
-    for line in data:
-        print(line)
+
+
+
+
+
 
 
 
@@ -82,11 +84,6 @@ def getWeather(lattit, longit):
 
 def menu():
     print("Geolocation weather finder based on zip code or longitude and lattitude.")
-    choice0 = input("type 'v' for verbose or anything else for nonverbose mode: ")
-    if 'v' not in choice0.lower():
-        verbose = False
-    else:
-        print("Verbose active")
 
     choice = input("\n1. Zip Code \n2. Lattitude Longitude \n3. Quit \n")
     if "1" in choice:
